@@ -88,24 +88,6 @@ display:none;
 }
 
 
-.progressBar{
-
-height:20px;
-background:#ddd;
-border-radius:10px;
-
-}
-
-
-.progressInner{
-
-height:20px;
-background:#4caf50;
-border-radius:10px;
-
-}
-
-
 .checkArea{
 
 margin-top:20px;
@@ -128,19 +110,17 @@ margin-top:20px;
 </h1>
 
 
-
 <div class="progressArea">
 
 <div id="progress"></div>
 
-</div>
 
+<button onclick="skipQuestion()">
 
-<div class="progressBar">
+問題スキップ
 
-<div id="progressInner"
-class="progressInner">
-</div>
+</button>
+
 
 </div>
 
@@ -149,9 +129,7 @@ class="progressInner">
 <h2 id="title"></h2>
 
 
-<div id="question"
-class="question">
-</div>
+<div id="question" class="question"></div>
 
 
 <div id="imageArea"></div>
@@ -169,14 +147,10 @@ class="question">
 
 
 
-
-<div id="explanation"
-class="explanation">
+<div id="explanation" class="explanation">
 
 
-<h3>
-解説
-</h3>
+<h3>解説</h3>
 
 
 <div id="result"></div>
@@ -199,12 +173,10 @@ onchange="toggleCheck()">
 
 この問題を復習リストに追加
 
-
 </label>
 
 
 </div>
-
 
 
 </div>
@@ -220,17 +192,11 @@ disabled>
 </button>
 
 
-
 <button onclick="goHome()">
 
 トップページへ戻る
 
 </button>
-
-
-
-
-
 <script>
 
 
@@ -242,13 +208,11 @@ let currentIndex=0;
 
 
 
-
+// CSV読み込み
 
 fetch("problems.csv")
 
-
 .then(response=>response.text())
-
 
 .then(data=>{
 
@@ -294,22 +258,28 @@ explanation:cols[8]
 setStudyList();
 
 
-
 });
+
+
+
+
+// 問題リスト作成
 
 function setStudyList(){
 
 
-let mode=localStorage.getItem("mode");
+let mode=
+localStorage.getItem("mode");
 
 
 if(mode=="random"){
 
+
 studyList=
 shuffle([...problems]).slice(0,10);
 
-}
 
+}
 
 else if(mode=="checked"){
 
@@ -327,7 +297,6 @@ p=>checked.includes(p.id)
 
 
 }
-
 
 else{
 
@@ -348,48 +317,29 @@ showQuestion();
 
 
 
+// 問題表示
+
 function showQuestion(){
 
 
-
-if(currentIndex>=studyList.length){
-
-alert("終了です");
-
-return;
-
-}
-
-
-
-let p=studyList[currentIndex];
-
+let p=
+studyList[currentIndex];
 
 
 document.getElementById("progress").textContent=
 
 "問題 "
-+(currentIndex+1)
-+" / "
-+studyList.length
 +
-"　 全体進捗 "
+(currentIndex+1)
 +
-getProgress()
+" / "
 +
-"%";
-
-
-
-document.getElementById("progressInner").style.width=
-
-getProgress()+"%";
+studyList.length;
 
 
 
 document.getElementById("title").textContent=
 p.title;
-
 
 
 document.getElementById("question").textContent=
@@ -404,8 +354,8 @@ document.getElementById("imageArea");
 imageArea.innerHTML="";
 
 
-
 if(p.image){
+
 
 imageArea.innerHTML=
 
@@ -425,7 +375,13 @@ answerArea.innerHTML="";
 
 
 
-if(p.type=="複数選択" || p.type=="選択"){
+// 複数選択
+
+if(
+p.type=="選択"
+||
+p.type=="複数選択"
+){
 
 
 
@@ -436,7 +392,6 @@ p.choice.split(";")
 answerArea.innerHTML+=
 
 `
-
 <div class="choice">
 
 <label>
@@ -451,37 +406,29 @@ ${c}
 </label>
 
 </div>
-
 `;
 
 
-
 });
+
 
 
 }
 
 
 
-else if(
-p.type=="自由記載"
-||
-p.type=="監査"
-){
+// 自由記載
 
+else{
 
 
 answerArea.innerHTML=
 
 `
-
 <textarea 
 placeholder="回答を入力してください">
 </textarea>
-
 `;
-
-
 
 }
 
@@ -496,7 +443,6 @@ document.getElementById("result").innerHTML="";
 document.getElementById("explanationText").innerHTML="";
 
 
-
 document.getElementById("nextButton").disabled=true;
 
 
@@ -504,12 +450,13 @@ document.getElementById("nextButton").disabled=true;
 updateCheck();
 
 
-
 }
 
 
 
 
+
+// 回答確認
 
 function showExplanation(){
 
@@ -522,10 +469,12 @@ let result="";
 
 
 
+// 選択問題
+
 if(
-p.type=="複数選択"
-||
 p.type=="選択"
+||
+p.type=="複数選択"
 ){
 
 
@@ -569,6 +518,7 @@ result=
 
 
 }
+
 else{
 
 
@@ -582,13 +532,22 @@ correct.join("、")
 +
 "<br><br>";
 
+}
+
 
 }
 
 
 
-}
+// 自由記載
 
+else{
+
+
+result=
+"<h3>回答を確認してください</h3>";
+
+}
 
 
 
@@ -613,16 +572,28 @@ document.getElementById("nextButton").disabled=false;
 markComplete(p.id);
 
 
-
 }
 
 
 
 
+
+// 次へ
+
 function nextQuestion(){
 
 
 currentIndex++;
+
+
+if(currentIndex>=studyList.length){
+
+
+alert("終了です");
+
+return;
+
+}
 
 
 showQuestion();
@@ -633,12 +604,25 @@ showQuestion();
 
 
 
-function shuffle(array){
+// スキップ
+
+function skipQuestion(){
 
 
-return array.sort(
-()=>Math.random()-0.5
-);
+currentIndex++;
+
+
+if(currentIndex>=studyList.length){
+
+
+alert("終了です");
+
+return;
+
+}
+
+
+showQuestion();
 
 
 }
@@ -646,6 +630,19 @@ return array.sort(
 
 
 
+// ランダム
+
+function shuffle(array){
+
+return array.sort(
+()=>Math.random()-0.5
+);
+
+}
+
+
+
+// ✓保存
 
 function toggleCheck(){
 
@@ -674,9 +671,7 @@ if(!checked.includes(p.id)){
 
 checked.push(p.id);
 
-
 }
-
 
 }
 
@@ -687,7 +682,6 @@ checked=
 checked.filter(
 id=>id!==p.id
 );
-
 
 }
 
@@ -702,12 +696,12 @@ JSON.stringify(checked)
 );
 
 
-
 }
 
 
 
 
+// ✓表示
 
 function updateCheck(){
 
@@ -728,12 +722,13 @@ document.getElementById("checkBox").checked=
 checked.includes(p.id);
 
 
-
 }
 
 
 
 
+
+// 学習済み
 
 function markComplete(id){
 
@@ -762,38 +757,6 @@ localStorage.setItem(
 JSON.stringify(done)
 
 );
-
-
-}
-
-
-
-
-
-function getProgress(){
-
-
-let done=
-JSON.parse(
-localStorage.getItem("doneQuestions") || "[]"
-);
-
-
-
-if(problems.length==0){
-
-return 0;
-
-}
-
-
-
-return Math.round(
-
-(done.length/problems.length)*100
-
-);
-
 
 
 }
