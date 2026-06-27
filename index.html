@@ -16,9 +16,18 @@ body{
 
 font-family:"メイリオ",sans-serif;
 
-background:#f5f5f5;
+background:
+linear-gradient(
+135deg,
+#e8f4ff,
+#ffffff
+);
 
-margin:30px;
+margin:0;
+
+padding:30px;
+
+min-height:100vh;
 
 }
 
@@ -31,19 +40,23 @@ max-width:700px;
 
 margin:auto;
 
-padding:30px;
+padding:35px;
 
-border-radius:10px;
+border-radius:20px;
+
+box-shadow:
+0 8px 25px rgba(0,0,0,0.1);
 
 text-align:center;
 
 }
 
 
-
 h1{
 
 font-size:28px;
+
+color:#1a4f7a;
 
 }
 
@@ -51,15 +64,31 @@ font-size:28px;
 
 button{
 
-width:80%;
+width:85%;
 
 padding:15px;
 
-margin:10px;
+margin:8px;
 
 font-size:18px;
 
 cursor:pointer;
+
+border:none;
+
+border-radius:12px;
+
+background:#1976d2;
+
+color:white;
+
+}
+
+
+
+button:hover{
+
+opacity:0.85;
 
 }
 
@@ -83,6 +112,8 @@ background:#ddd;
 
 border-radius:10px;
 
+overflow:hidden;
+
 }
 
 
@@ -103,21 +134,21 @@ width:0%;
 
 .menuTitle{
 
-margin-top:30px;
+margin-top:35px;
 
 font-size:20px;
 
 font-weight:bold;
 
-}
+color:#1a4f7a;
 
+}
 
 
 </style>
 
 
 </head>
-
 
 
 <body>
@@ -127,7 +158,7 @@ font-weight:bold;
 
 
 <h1>
-処方監査問題集
+💊 処方監査問題集
 </h1>
 
 
@@ -139,6 +170,7 @@ font-weight:bold;
 </button>
 
 
+
 <button onclick="continueStudy()">
 
 続きから
@@ -146,11 +178,21 @@ font-weight:bold;
 </button>
 
 
+
+<button onclick="startUnlearned()">
+
+未学習問題
+
+</button>
+
+
+
 <button onclick="startRandom()">
 
 ランダム10問
 
 </button>
+
 
 
 <button onclick="startChecked()">
@@ -189,10 +231,7 @@ class="progressInner">
 </div>
 
 
-
 </div>
-
-
 
 
 
@@ -209,8 +248,6 @@ class="progressInner">
 
 
 
-
-
 <div class="menuTitle">
 
 問題タイプから
@@ -224,14 +261,13 @@ class="progressInner">
 <script>
 
 
-// 最初から
-
 function startAll(){
 
 localStorage.setItem(
 "mode",
 "all"
 );
+
 
 localStorage.setItem(
 "lastIndex",
@@ -250,7 +286,6 @@ location.href="study.html";
 
 function continueStudy(){
 
-
 localStorage.setItem(
 "mode",
 "continue"
@@ -259,16 +294,29 @@ localStorage.setItem(
 
 location.href="study.html";
 
-
 }
 
+
+
+// 未学習問題
+
+function startUnlearned(){
+
+localStorage.setItem(
+"mode",
+"unlearned"
+);
+
+
+location.href="study.html";
+
+}
 
 
 
 // ランダム10問
 
 function startRandom(){
-
 
 localStorage.setItem(
 "mode",
@@ -278,17 +326,13 @@ localStorage.setItem(
 
 location.href="study.html";
 
-
 }
-
-
 
 
 
 // ✓復習問題
 
 function startChecked(){
-
 
 localStorage.setItem(
 "mode",
@@ -297,7 +341,6 @@ localStorage.setItem(
 
 
 location.href="study.html";
-
 
 }
 
@@ -308,7 +351,6 @@ location.href="study.html";
 // 進捗表示
 
 function showProgress(){
-
 
 
 fetch("problems.csv")
@@ -344,9 +386,7 @@ localStorage.getItem("doneQuestions")
 let percent=0;
 
 
-
 if(total>0){
-
 
 percent=
 
@@ -356,9 +396,27 @@ Math.round(
 
 );
 
+}
+
+
+
+
+if(percent>=100){
+
+
+document.getElementById("progressText").innerHTML=
+
+"🎉 全問終了しました";
+
+
+document.getElementById("progressInner").style.width=
+
+"100%";
+
 
 }
 
+else{
 
 
 document.getElementById("progressText").textContent=
@@ -376,10 +434,12 @@ percent
 "%）";
 
 
-
 document.getElementById("progressInner").style.width=
 
 percent+"%";
+
+
+}
 
 
 
@@ -387,6 +447,8 @@ percent+"%";
 
 
 }
+
+
 
 
 
@@ -448,12 +510,13 @@ types.push(cols[1]);
 
 
 
+
 let categoryArea=
 document.getElementById("categoryArea");
 
 
-categories.forEach(function(c){
 
+categories.forEach(function(c){
 
 
 let btn=
@@ -461,6 +524,7 @@ document.createElement("button");
 
 
 btn.textContent=c;
+
 
 
 btn.onclick=function(){
@@ -472,10 +536,12 @@ localStorage.setItem(
 );
 
 
+
 localStorage.setItem(
 "category",
 c
 );
+
 
 
 location.href="study.html";
@@ -489,6 +555,8 @@ categoryArea.appendChild(btn);
 
 
 });
+
+
 
 
 
@@ -518,6 +586,7 @@ localStorage.setItem(
 "mode",
 "type"
 );
+
 
 
 localStorage.setItem(
@@ -560,7 +629,6 @@ createMenu();
 
 
 </script>
-
 
 
 </div>
