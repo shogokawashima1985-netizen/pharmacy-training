@@ -796,3 +796,26 @@ markComplete(p.id);
 
 
 }
+function markComplete(id){
+
+let done=
+JSON.parse(
+localStorage.getItem("doneQuestions")
+||
+"[]"
+);
+
+
+if(!done.includes(id)){
+
+done.push(id);
+
+}
+
+
+localStorage.setItem(
+"doneQuestions",
+JSON.stringify(done)
+);
+
+}
