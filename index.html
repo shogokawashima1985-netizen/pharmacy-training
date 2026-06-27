@@ -12,7 +12,6 @@
 
 <style>
 
-
 body{
 
 font-family:"メイリオ",sans-serif;
@@ -28,7 +27,7 @@ margin:30px;
 
 background:white;
 
-max-width:800px;
+max-width:700px;
 
 margin:auto;
 
@@ -36,68 +35,89 @@ padding:30px;
 
 border-radius:10px;
 
+text-align:center;
+
 }
+
 
 
 h1{
 
-text-align:center;
+font-size:28px;
 
 }
 
-
-#status{
-
-text-align:center;
-
-font-size:18px;
-
-margin:20px;
-
-}
-
-
-.box{
-
-margin-top:25px;
-
-padding:20px;
-
-border:1px solid #ccc;
-
-border-radius:8px;
-
-}
 
 
 button{
 
-padding:12px 25px;
+width:80%;
 
-font-size:16px;
+padding:15px;
 
 margin:10px;
+
+font-size:18px;
 
 cursor:pointer;
 
 }
 
 
-select{
 
-padding:8px;
+.progressBox{
 
-font-size:16px;
+margin-top:30px;
 
-width:250px;
+text-align:left;
 
 }
+
+
+
+.progressBar{
+
+height:20px;
+
+background:#ddd;
+
+border-radius:10px;
+
+}
+
+
+
+.progressInner{
+
+height:20px;
+
+background:#4caf50;
+
+border-radius:10px;
+
+width:0%;
+
+}
+
+
+
+.menuTitle{
+
+margin-top:30px;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
 
 
 </style>
 
 
 </head>
+
 
 
 <body>
@@ -111,50 +131,19 @@ width:250px;
 </h1>
 
 
-<div id="status">
-
-</div>
-
-
-
-
-<div class="box">
-
-
-<h2>
-開始方法
-</h2>
-
-
 
 <button onclick="startAll()">
 
-最初から開始
+最初から
 
 </button>
-
 
 
 <button onclick="continueStudy()">
 
-前回の続きから開始
+続きから
 
 </button>
-
-
-</div>
-
-
-
-
-
-<div class="box">
-
-
-<h2>
-復習メニュー
-</h2>
-
 
 
 <button onclick="startRandom()">
@@ -162,8 +151,6 @@ width:250px;
 ランダム10問
 
 </button>
-
-
 
 
 <button onclick="startChecked()">
@@ -174,40 +161,33 @@ width:250px;
 
 
 
-</div>
-
-
-
-
-
-<div class="box">
+<div class="progressBox">
 
 
 <h2>
-分類から開始
+学習進捗
 </h2>
 
 
+<div id="progressText">
 
-<select id="category">
+読み込み中...
 
-
-<option value="all">
-
-すべて
-
-</option>
+</div>
 
 
-</select>
+<br>
 
 
+<div class="progressBar">
 
-<button onclick="startCategory()">
+<div id="progressInner"
+class="progressInner">
 
-開始
+</div>
 
-</button>
+</div>
+
 
 
 </div>
@@ -216,67 +196,118 @@ width:250px;
 
 
 
-<div class="box">
+<div class="menuTitle">
+
+分類から
+
+</div>
 
 
-<h2>
-問題タイプから開始
-</h2>
+<div id="categoryArea">
 
-
-
-<select id="type">
-
-
-
-<option value="all">
-
-すべて
-
-</option>
+</div>
 
 
 
-<option value="複数選択">
-
-複数選択
-
-</option>
 
 
+<div class="menuTitle">
 
-<option value="自由記載">
+問題タイプから
 
-自由記載
-
-</option>
-
+</div>
 
 
-<option value="監査">
-
-監査
-
-</option>
-
-
-
-</select>
-
-
-
-<button onclick="startType()">
-
-開始
-
-</button>
-
+<div id="typeArea">
 
 </div>
 <script>
 
 
-let problems=[];
+// 最初から
+
+function startAll(){
+
+localStorage.setItem(
+"mode",
+"all"
+);
+
+localStorage.setItem(
+"lastIndex",
+"0"
+);
+
+
+location.href="study.html";
+
+
+}
+
+
+
+// 続きから
+
+function continueStudy(){
+
+
+localStorage.setItem(
+"mode",
+"continue"
+);
+
+
+location.href="study.html";
+
+
+}
+
+
+
+
+// ランダム10問
+
+function startRandom(){
+
+
+localStorage.setItem(
+"mode",
+"random"
+);
+
+
+location.href="study.html";
+
+
+}
+
+
+
+
+
+// ✓復習問題
+
+function startChecked(){
+
+
+localStorage.setItem(
+"mode",
+"checked"
+);
+
+
+location.href="study.html";
+
+
+}
+
+
+
+
+
+// 進捗表示
+
+function showProgress(){
 
 
 
@@ -289,290 +320,230 @@ fetch("problems.csv")
 .then(data=>{
 
 
-let rows=data.trim().split(/\r?\n/);
+let rows=
+data.trim().split(/\r?\n/);
+
+
+let total=
+rows.length-1;
+
+
+
+let done=
+
+JSON.parse(
+
+localStorage.getItem("doneQuestions")
+||
+"[]"
+
+);
+
+
+
+let percent=0;
+
+
+
+if(total>0){
+
+
+percent=
+
+Math.round(
+
+(done.length/total)*100
+
+);
+
+
+}
+
+
+
+document.getElementById("progressText").textContent=
+
+done.length
++
+" / "
++
+total
++
+" 問完了（"
++
+percent
++
+"%）";
+
+
+
+document.getElementById("progressInner").style.width=
+
+percent+"%";
+
+
+
+});
+
+
+}
+
+
+
+
+// 分類・タイプ作成
+
+function createMenu(){
+
+
+fetch("problems.csv")
+
+
+.then(response=>response.text())
+
+
+.then(data=>{
+
+
+let rows=
+data.trim().split(/\r?\n/);
+
+
+
+let categories=[];
+
+let types=[];
 
 
 
 for(let i=1;i<rows.length;i++){
 
 
-let cols=rows[i].split(",");
+let cols=
+rows[i].split(",");
 
 
 
-problems.push({
+if(
+!categories.includes(cols[2])
+){
 
-id:cols[0],
+categories.push(cols[2]);
 
-type:cols[1],
-
-category:cols[2],
-
-title:cols[3],
-
-question:cols[4],
-
-choice:cols[5],
-
-image:cols[6],
-
-explanation:cols[7]
+}
 
 
-});
+
+if(
+!types.includes(cols[1])
+){
+
+types.push(cols[1]);
+
+}
 
 
 }
 
 
 
-createCategory();
 
-showStatus();
-
-
-})
-
-
-.catch(error=>{
-
-
-alert(
-
-"CSV読み込みエラー\n"+error
-
-);
-
-
-});
-
-
-
-
-
-function createCategory(){
-
-
-let select=document.getElementById("category");
-
-
-
-let categories=[...new Set(
-
-problems.map(
-p=>p.category
-)
-
-)];
-
+let categoryArea=
+document.getElementById("categoryArea");
 
 
 categories.forEach(function(c){
 
 
-let option=document.createElement("option");
+
+let btn=
+document.createElement("button");
 
 
-option.value=c;
+btn.textContent=c;
 
 
-option.textContent=c;
+btn.onclick=function(){
 
 
-select.appendChild(option);
+localStorage.setItem(
+"mode",
+"category"
+);
+
+
+localStorage.setItem(
+"category",
+c
+);
+
+
+location.href="study.html";
+
+
+};
+
+
+
+categoryArea.appendChild(btn);
 
 
 });
 
 
-}
 
 
 
-
-//問題数表示
-
-function showStatus(){
-
-
-let checked =
-
-JSON.parse(
-
-localStorage.getItem("checkedQuestions") || "[]"
-
-);
+let typeArea=
+document.getElementById("typeArea");
 
 
 
-document.getElementById("status").innerHTML =
-
-
-"総問題数："
-+
-problems.length
-+
-"問<br>"
-+
-"復習待ち（✓）："
-+
-checked.length
-+
-"問";
-
-
-}
+types.forEach(function(t){
 
 
 
+let btn=
+document.createElement("button");
 
 
-//最初から
+btn.textContent=t;
 
-function startAll(){
+
+
+btn.onclick=function(){
 
 
 localStorage.setItem(
-
 "mode",
-
-"all"
-
-);
-
-
-
-localStorage.removeItem(
-
-"lastIndex"
-
-);
-
-
-
-location.href="study.html";
-
-
-}
-
-
-
-
-
-//続きから
-
-function continueStudy(){
-
-
-localStorage.setItem(
-
-"mode",
-
-"continue"
-
-);
-
-
-
-location.href="study.html";
-
-
-}
-
-
-
-
-
-
-//分類
-
-function startCategory(){
-
-
-let category=
-
-document.getElementById("category").value;
-
-
-
-localStorage.setItem(
-
-"mode",
-
-"category"
-
-);
-
-
-
-localStorage.setItem(
-
-"category",
-
-category
-
-);
-
-
-
-localStorage.removeItem(
-
-"lastIndex"
-
-);
-
-
-
-location.href="study.html";
-
-
-}
-
-
-
-
-
-
-//問題タイプ
-
-function startType(){
-
-
-let type=
-
-document.getElementById("type").value;
-
-
-
-localStorage.setItem(
-
-"mode",
-
 "type"
-
 );
 
 
-
 localStorage.setItem(
-
 "type",
-
-type
-
-);
-
-
-
-localStorage.removeItem(
-
-"lastIndex"
-
+t
 );
 
 
 
 location.href="study.html";
+
+
+};
+
+
+
+typeArea.appendChild(btn);
+
+
+
+});
+
+
+
+});
+
 
 
 }
@@ -581,74 +552,21 @@ location.href="study.html";
 
 
 
-
-//ランダム10問
-
-function startRandom(){
+showProgress();
 
 
-localStorage.setItem(
-
-"mode",
-
-"random"
-
-);
-
-
-
-localStorage.removeItem(
-
-"lastIndex"
-
-);
-
-
-
-location.href="study.html";
-
-
-}
-
-
-
-
-
-//✓問題
-
-function startChecked(){
-
-
-localStorage.setItem(
-
-"mode",
-
-"checked"
-
-);
-
-
-
-localStorage.removeItem(
-
-"lastIndex"
-
-);
-
-
-
-location.href="study.html";
-
-
-}
+createMenu();
 
 
 
 </script>
 
 
+
 </div>
 
+
 </body>
+
 
 </html>
