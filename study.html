@@ -11,81 +11,136 @@
 <style>
 
 body{
+
 font-family:"メイリオ",sans-serif;
+
 background:#f5f5f5;
+
 margin:30px;
+
 }
 
 
 .container{
+
 background:white;
+
 max-width:900px;
+
 margin:auto;
+
 padding:30px;
-border-radius:10px;
+
+border-radius:15px;
+
+box-shadow:0 5px 20px rgba(0,0,0,0.1);
+
 }
+
 
 
 h1{
-font-size:28px;
+
+color:#1a4f7a;
+
 }
+
 
 
 .progressArea{
+
 display:flex;
+
 justify-content:space-between;
-font-size:18px;
+
+align-items:center;
+
 }
+
 
 
 .question{
+
 font-size:20px;
+
 line-height:1.6;
+
 margin-top:20px;
+
 }
+
 
 
 .choice{
+
 margin:12px 0;
+
 font-size:18px;
+
 }
+
 
 
 textarea{
+
 width:100%;
+
 height:150px;
+
 font-size:16px;
+
 }
+
 
 
 button{
+
 padding:12px 25px;
+
 font-size:16px;
+
 margin:10px;
+
 cursor:pointer;
+
+border-radius:10px;
+
 }
+
 
 
 button:disabled{
+
 opacity:0.5;
+
 }
+
 
 
 img{
+
 max-width:100%;
+
 margin-top:20px;
+
 }
+
 
 
 .explanation{
 
 background:#eef5ff;
+
 padding:20px;
+
 margin-top:20px;
-border-radius:8px;
+
+border-radius:10px;
+
 display:none;
 
 }
+
 
 
 .checkArea{
@@ -94,7 +149,9 @@ margin-top:20px;
 
 }
 
+
 </style>
+
 
 </head>
 
@@ -106,13 +163,15 @@ margin-top:20px;
 
 
 <h1>
-処方監査問題集
+💊 処方監査問題集
 </h1>
 
 
 <div class="progressArea">
 
+
 <div id="progress"></div>
+
 
 
 <button onclick="skipQuestion()">
@@ -125,14 +184,18 @@ margin-top:20px;
 </div>
 
 
-
 <h2 id="title"></h2>
 
 
-<div id="question" class="question"></div>
+<div id="question"
+class="question">
+
+</div>
+
 
 
 <div id="imageArea"></div>
+
 
 
 <div id="answerArea"></div>
@@ -147,10 +210,13 @@ margin-top:20px;
 
 
 
-<div id="explanation" class="explanation">
+<div id="explanation"
+class="explanation">
 
 
-<h3>解説</h3>
+<h3>
+解説
+</h3>
 
 
 <div id="result"></div>
@@ -165,6 +231,7 @@ margin-top:20px;
 
 <label>
 
+
 <input 
 type="checkbox"
 id="checkBox"
@@ -172,6 +239,7 @@ onchange="toggleCheck()">
 
 
 この問題を復習リストに追加
+
 
 </label>
 
@@ -192,6 +260,7 @@ disabled>
 </button>
 
 
+
 <button onclick="goHome()">
 
 トップページへ戻る
@@ -208,23 +277,28 @@ let currentIndex=0;
 
 
 
+
 // CSV読み込み
 
 fetch("problems.csv")
 
+
 .then(response=>response.text())
+
 
 .then(data=>{
 
 
-let rows=data.trim().split(/\r?\n/);
+let rows=
+data.trim().split(/\r?\n/);
 
 
 
 for(let i=1;i<rows.length;i++){
 
 
-let cols=rows[i].split(",");
+let cols=
+rows[i].split(",");
 
 
 
@@ -263,6 +337,8 @@ setStudyList();
 
 
 
+
+
 // 問題リスト作成
 
 function setStudyList(){
@@ -270,6 +346,7 @@ function setStudyList(){
 
 let mode=
 localStorage.getItem("mode");
+
 
 
 if(mode=="random"){
@@ -281,22 +358,117 @@ shuffle([...problems]).slice(0,10);
 
 }
 
+
+
 else if(mode=="checked"){
 
 
+
 let checked=
+
 JSON.parse(
-localStorage.getItem("checkedQuestions") || "[]"
+
+localStorage.getItem("checkedQuestions")
+||
+"[]"
+
 );
 
 
+
 studyList=
+
 problems.filter(
+
 p=>checked.includes(p.id)
+
 );
 
 
 }
+
+
+
+
+// 未学習問題
+
+else if(mode=="unlearned"){
+
+
+
+let done=
+
+JSON.parse(
+
+localStorage.getItem("doneQuestions")
+||
+"[]"
+
+);
+
+
+
+studyList=
+
+problems.filter(
+
+p=>!done.includes(p.id)
+
+);
+
+
+}
+
+
+
+
+else if(mode=="category"){
+
+
+
+let category=
+
+localStorage.getItem("category");
+
+
+
+studyList=
+
+problems.filter(
+
+p=>p.category==category
+
+);
+
+
+}
+
+
+
+
+else if(mode=="type"){
+
+
+
+let type=
+
+localStorage.getItem("type");
+
+
+
+studyList=
+
+problems.filter(
+
+p=>p.type==type
+
+);
+
+
+}
+
+
+
 
 else{
 
@@ -322,8 +494,22 @@ showQuestion();
 function showQuestion(){
 
 
+if(currentIndex>=studyList.length){
+
+
+alert("終了です");
+
+
+return;
+
+
+}
+
+
+
 let p=
 studyList[currentIndex];
+
 
 
 document.getElementById("progress").textContent=
@@ -339,19 +525,25 @@ studyList.length;
 
 
 document.getElementById("title").textContent=
+
 p.title;
 
 
+
 document.getElementById("question").textContent=
+
 p.question;
 
 
 
+
 let imageArea=
+
 document.getElementById("imageArea");
 
 
 imageArea.innerHTML="";
+
 
 
 if(p.image){
@@ -363,11 +555,14 @@ imageArea.innerHTML=
 <img src="images/${p.image}">
 `;
 
+
 }
 
 
 
+
 let answerArea=
+
 document.getElementById("answerArea");
 
 
@@ -375,38 +570,48 @@ answerArea.innerHTML="";
 
 
 
-// 複数選択
+
+// 選択問題
 
 if(
+
 p.type=="選択"
 ||
 p.type=="複数選択"
+
 ){
 
 
 
 p.choice.split(";")
+
 .forEach(function(c){
+
 
 
 answerArea.innerHTML+=
 
 `
+
 <div class="choice">
 
 <label>
 
-<input 
+<input
 type="checkbox"
 class="answerCheck"
 value="${c}">
 
+
 ${c}
+
 
 </label>
 
 </div>
+
 `;
+
 
 
 });
@@ -416,21 +621,28 @@ ${c}
 }
 
 
-
 // 自由記載
 
 else{
 
 
+
 answerArea.innerHTML=
 
 `
-<textarea 
+
+<textarea
 placeholder="回答を入力してください">
+
 </textarea>
+
 `;
 
+
+
 }
+
+
 
 
 
@@ -461,20 +673,25 @@ updateCheck();
 function showExplanation(){
 
 
+
 let p=
 studyList[currentIndex];
+
 
 
 let result="";
 
 
 
-// 選択問題
+
+// 選択問題判定
 
 if(
+
 p.type=="選択"
 ||
 p.type=="複数選択"
+
 ){
 
 
@@ -487,7 +704,9 @@ document.querySelectorAll(".answerCheck:checked")
 
 .forEach(function(box){
 
+
 selected.push(box.value);
+
 
 });
 
@@ -498,6 +717,7 @@ selected.sort();
 
 
 let correct=
+
 p.answer.split(";");
 
 
@@ -505,7 +725,9 @@ correct.sort();
 
 
 
+
 if(
+
 JSON.stringify(selected)
 ==
 JSON.stringify(correct)
@@ -514,6 +736,7 @@ JSON.stringify(correct)
 
 
 result=
+
 "<h3>○ 正解</h3>";
 
 
@@ -537,26 +760,26 @@ correct.join("、")
 
 }
 
-
-
-// 自由記載
-
 else{
 
 
 result=
+
 "<h3>回答を確認してください</h3>";
 
 }
 
 
 
+
 document.getElementById("result").innerHTML=
+
 result;
 
 
 
 document.getElementById("explanationText").innerHTML=
+
 p.explanation;
 
 
@@ -573,214 +796,3 @@ markComplete(p.id);
 
 
 }
-
-
-
-
-
-// 次へ
-
-function nextQuestion(){
-
-
-currentIndex++;
-
-
-if(currentIndex>=studyList.length){
-
-
-alert("終了です");
-
-return;
-
-}
-
-
-showQuestion();
-
-
-}
-
-
-
-
-// スキップ
-
-function skipQuestion(){
-
-
-currentIndex++;
-
-
-if(currentIndex>=studyList.length){
-
-
-alert("終了です");
-
-return;
-
-}
-
-
-showQuestion();
-
-
-}
-
-
-
-
-// ランダム
-
-function shuffle(array){
-
-return array.sort(
-()=>Math.random()-0.5
-);
-
-}
-
-
-
-// ✓保存
-
-function toggleCheck(){
-
-
-let p=
-studyList[currentIndex];
-
-
-let checked=
-JSON.parse(
-localStorage.getItem("checkedQuestions") || "[]"
-);
-
-
-
-let box=
-document.getElementById("checkBox");
-
-
-
-if(box.checked){
-
-
-if(!checked.includes(p.id)){
-
-
-checked.push(p.id);
-
-}
-
-}
-
-else{
-
-
-checked=
-checked.filter(
-id=>id!==p.id
-);
-
-}
-
-
-
-localStorage.setItem(
-
-"checkedQuestions",
-
-JSON.stringify(checked)
-
-);
-
-
-}
-
-
-
-
-// ✓表示
-
-function updateCheck(){
-
-
-let p=
-studyList[currentIndex];
-
-
-let checked=
-JSON.parse(
-localStorage.getItem("checkedQuestions") || "[]"
-);
-
-
-
-document.getElementById("checkBox").checked=
-
-checked.includes(p.id);
-
-
-}
-
-
-
-
-
-// 学習済み
-
-function markComplete(id){
-
-
-let done=
-JSON.parse(
-localStorage.getItem("doneQuestions") || "[]"
-);
-
-
-
-if(!done.includes(id)){
-
-
-done.push(id);
-
-
-}
-
-
-
-localStorage.setItem(
-
-"doneQuestions",
-
-JSON.stringify(done)
-
-);
-
-
-}
-
-
-
-
-
-function goHome(){
-
-
-location.href="index.html";
-
-
-}
-
-
-</script>
-
-
-</div>
-
-
-</body>
-
-
-</html>
